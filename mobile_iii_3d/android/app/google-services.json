@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "478700436412",
+    "project_id": "mobile-iii-3d",
+    "storage_bucket": "mobile-iii-3d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:478700436412:android:eaf7dcf4ad56b506b189b9",
+        "android_client_info": {
+          "package_name": "com.example.mobile_iii_3d"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3Lgi_9RCOn29Lh4NicYlrYJSDxFWpgWY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

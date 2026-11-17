@@ -1,0 +1,78 @@
+Conversa de desenvolvimento do projeto mobile_iii_3d
+
+1) Requisito do professor
+- Google
+- Apple
+- GitHub
+- SQLite
+- Firebase
+
+2) Objetivo inicial
+- Implementar a tela de login primeiro, antes da autenticação completa.
+
+3) Estado inicial do projeto
+- Projeto Flutter em pasta mobile_iii_3d.
+- Já existiam dependências para Firebase, Google Sign-In, Apple Sign-In e SQLite.
+- O app tinha um banco SQLite mínimo e um arquivo main.dart com Firebase inicializado.
+
+4) Implementação da tela de login
+- Criada tela de login em lib/features/auth/screens/login_screen.dart.
+- Layout com:
+  - campo de e-mail
+  - campo de senha
+  - mostrar/ocultar senha
+  - checkbox de lembrar de mim
+  - botão Entrar
+  - botão Esqueci a senha
+  - botões de Google, Apple e GitHub
+  - texto de cadastro
+
+5) Ajustes de estrutura
+- App principal configurado em lib/main.dart para abrir a LoginScreen.
+- Banco SQLite ajustado em lib/database/db_helper.dart para suportar usuários locais e login por email/senha.
+- Usuário demo criado:
+  - email: admin@teste.com
+  - senha: 123456
+
+6) Validação da interface
+- Foi criado teste de widget para a tela de login.
+- Teste validado com sucesso:
+  - flutter test test/login_screen_test.dart
+  - resultado: All tests passed!
+
+7) Desenvolvimento da autenticação real
+- Criado serviço centralizado em lib/services/auth_service.dart.
+- Lógica implementada para:
+  - login por email/senha
+  - fallback local (SQLite)
+  - preparação para Google, Apple e GitHub
+- O serviço usa Firebase quando está configurado e entra em fallback local quando não está.
+
+8) Ajustes de compatibilidade
+- Foram corrigidos problemas de compatibilidade com as versões dos pacotes instalados.
+- Ajustado o uso do Google Sign-In e do Sign in with Apple conforme a API real das bibliotecas utilizadas.
+- Adicionado sqflite_common_ffi para testar SQLite em ambiente de VM.
+
+9) Validação final
+- Comando executado:
+  - flutter pub get && flutter test test/auth_service_test.dart test/login_screen_test.dart
+- Resultado verificado:
+  - All tests passed!
+
+10) Como rodar a aplicação no navegador
+- Comando:
+  - flutter run -d web-server --web-port 8080
+- URL:
+  - http://localhost:8080
+
+11) Situação atual
+- A aplicação já está rodando em ambiente web com a tela de login.
+- O login local SQLite está funcional.
+- A autenticação real com Firebase/Google/Apple/GitHub depende de configuração adicional de credenciais no Firebase.
+
+12) Próximo passo sugerido
+- Configurar o Firebase no projeto.
+- Ativar autenticação real nas plataformas Google, Apple e GitHub.
+- Criar a tela principal após autenticação.
+
+Fim da conversa até o momento.
