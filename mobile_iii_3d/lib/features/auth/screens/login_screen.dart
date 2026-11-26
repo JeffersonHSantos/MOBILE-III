@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../services/auth_service.dart';
@@ -18,9 +20,41 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   bool _rememberMe = true;
   bool _isLoading = false;
+  StreamSubscription<Map<String, dynamic>?>? _authSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _restoreWebRedirectLogin();
+    _authSubscription = AuthService.authenticatedUserChanges.listen((user) {
+      if (!mounted || user == null) return;
+      _goToHome(user);
+    });
+  }
+
+  Future<void> _restoreWebRedirectLogin() async {
+    final user = await AuthService.getWebRedirectResult();
+    if (!mounted) return;
+    if (user == null) {
+      if (AuthService.lastError != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erro no login social: ${AuthService.lastError}'),
+              backgroundColor: const Color(0xFFDC2626),
+            ),
+          );
+        });
+      }
+      return;
+    }
+    _goToHome(user);
+  }
 
   @override
   void dispose() {
+    _authSubscription?.cancel();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -30,6 +64,50 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => HomeScreen(user: user)),
     );
+  }
+
+  Future<void> _handleSocialLogin(
+    Future<Map<String, dynamic>?> Function() login,
+    String providerName,
+  ) async {
+    setState(() => _isLoading = true);
+
+    try {
+      final user = await login();
+      if (!mounted) return;
+
+      // Se o fluxo precisou de redirecionamento do navegador
+      if (user != null && user['status'] == 'redirecting') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Redirecionando para autenticação com $providerName...'),
+            backgroundColor: const Color(0xFF4F46E5),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+        return;
+      }
+
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AuthService.lastError == null
+                  ? 'Não foi possível entrar com $providerName. Verifique as configurações do provedor.'
+                  : 'Erro $providerName: ${AuthService.lastError}',
+            ),
+            backgroundColor: const Color(0xFFDC2626),
+          ),
+        );
+        return;
+      }
+
+      _goToHome(user);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   Future<void> _handleLogin() async {
@@ -318,23 +396,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 logo: 'G',
                                 label: 'Google',
                                 badgeColor: const Color(0xFFEA4335),
-                                onPressed: () async {
-                                  final user =
-                                      await AuthService.signInWithGoogle();
-                                  if (!mounted) return;
-                                  if (user == null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Google não está configurado. Configure o Firebase e o Google Sign-In.',
+                                onPressed: _isLoading
+                                    ? null
+                                    : () => _handleSocialLogin(
+                                          AuthService.signInWithGoogle,
+                                          'Google',
                                         ),
-                                        backgroundColor: Color(0xFFDC2626),
-                                      ),
-                                    );
-                                    return;
-                                  }
-                                  _goToHome(user);
-                                },
                               ),
                             ),
                             SizedBox(
@@ -343,23 +410,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 logo: 'A',
                                 label: 'Apple',
                                 badgeColor: Colors.black,
-                                onPressed: () async {
-                                  final user =
-                                      await AuthService.signInWithApple();
-                                  if (!mounted) return;
-                                  if (user == null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Apple não está configurado. Configure o Firebase e o Sign in with Apple.',
+                                onPressed: _isLoading
+                                    ? null
+                                    : () => _handleSocialLogin(
+                                          AuthService.signInWithApple,
+                                          'Apple',
                                         ),
-                                        backgroundColor: Color(0xFFDC2626),
-                                      ),
-                                    );
-                                    return;
-                                  }
-                                  _goToHome(user);
-                                },
                               ),
                             ),
                             SizedBox(
@@ -368,23 +424,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 logo: 'GH',
                                 label: 'GitHub',
                                 badgeColor: const Color(0xFF111827),
-                                onPressed: () async {
-                                  final user =
-                                      await AuthService.signInWithGitHub();
-                                  if (!mounted) return;
-                                  if (user == null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'GitHub não está configurado. Configure o Firebase e o GitHub Auth.',
+                                onPressed: _isLoading
+                                    ? null
+                                    : () => _handleSocialLogin(
+                                          AuthService.signInWithGitHub,
+                                          'GitHub',
                                         ),
-                                        backgroundColor: Color(0xFFDC2626),
-                                      ),
-                                    );
-                                    return;
-                                  }
-                                  _goToHome(user);
-                                },
                               ),
                             ),
                           ],
@@ -435,7 +480,7 @@ class _SocialLoginButton extends StatelessWidget {
   final String logo;
   final String label;
   final Color badgeColor;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   const _SocialLoginButton({
     required this.logo,

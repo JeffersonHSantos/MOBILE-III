@@ -1,0 +1,312 @@
+CONTEXTO COMPLETO PARA CONTINUAÇÃO NO ANTIGRAVITY
+Projeto: MOBILE-III 3D
+Autor: Jefferson Henrique Alves Dos Santos
+Repositório: /home/jeff-h-santos/repo/MOBILE-III
+Projeto Flutter: /home/jeff-h-santos/repo/MOBILE-III/mobile_iii_3d
+Data: 23/11/2026
+
+============================================================
+OBJETIVO ATUAL
+============================================================
+
+O professor exigiu inicialmente:
+- SSO com Google, Apple e GitHub
+- SQLite
+- Firebase
+
+A prioridade é deixar o login social funcional. Somente depois disso devem ser implementadas as regras completas do aplicativo descritas em:
+- Prompt Mestre do Projeto.md
+- Regras para Assistentes de IA.md
+
+O usuário pediu que o Antigravity primeiro resolva a autenticação social. Não avance para o ERP até confirmar que os provedores funcionam.
+
+============================================================
+ESTADO DO PROJETO
+============================================================
+
+O projeto já possui:
+- Flutter instalado via Snap: Flutter 3.50.1, Dart 3.14.0
+- Firebase Core e Firebase Auth
+- Google Sign-In
+- Sign in with Apple
+- SQLite/sqflite
+- Tela de login com email/senha, Google, Apple e GitHub
+- Tela de Dashboard/Home após login
+- Login local demonstrativo funcionando
+- Banco SQLite mínimo para usuários locais
+- Usuário local de demonstração:
+  Email: admin@teste.com
+  Senha: 123456
+
+O projeto já foi analisado e os testes direcionados passaram:
+flutter test test/auth_service_test.dart test/login_screen_test.dart
+
+O aplicativo funciona no navegador em:
+http://localhost:8080
+
+Arquivos principais:
+- mobile_iii_3d/lib/main.dart
+- mobile_iii_3d/lib/firebase_options.dart
+- mobile_iii_3d/lib/services/auth_service.dart
+- mobile_iii_3d/lib/features/auth/screens/login_screen.dart
+- mobile_iii_3d/lib/features/home/screens/home_screen.dart
+- mobile_iii_3d/lib/database/db_helper.dart
+- mobile_iii_3d/android/app/google-services.json
+- mobile_iii_3d/android/app/build.gradle.kts
+- mobile_iii_3d/android/settings.gradle.kts
+- mobile_iii_3d/android/app/src/main/AndroidManifest.xml
+- mobile_iii_3d/pubspec.yaml
+- mobile_iii_3d/README.md
+
+============================================================
+CONFIGURAÇÃO FIREBASE
+============================================================
+
+Projeto Firebase:
+- Projeto: mobile-iii-3d
+- Project ID: mobile-iii-3d
+- Project Number: 478700436412
+- Package Android: com.example.mobile_iii_3d
+- App ID Android: 1:478700436412:android:eaf7dcf4ad56b506b189b9
+- Contas administrativas:
+  Proprietário pessoal: jefff.jhs@gmail.com
+  Editor da faculdade: 210017@upf.br
+
+Os provedores Google e GitHub estão registrados como ativados no Firebase Console.
+O Apple ainda não está configurado por depender de conta Apple Developer paga e/ou credenciais específicas.
+
+Domínios autorizados confirmados no Firebase:
+- localhost
+- mobile-iii-3d.firebaseapp.com
+- mobile-iii-3d.web.app
+
+Aplicativos registrados no Firebase:
+- Android: com.example.mobile_iii_3d
+- Web: mobile_iii_3d (web)
+- Também existe um registro Web chamado mobile_iii_3d (windows), mas o ambiente atual usa Web/Android.
+
+============================================================
+CONFIGURAÇÃO ANDROID
+============================================================
+
+O google-services.json atualizado já está em:
+mobile_iii_3d/android/app/google-services.json
+
+O arquivo contém:
+- Project ID mobile-iii-3d
+- Package com.example.mobile_iii_3d
+- OAuth client Android
+- certificate_hash com o SHA-1 gerado no ambiente Linux
+
+Chave de depuração criada em:
+~/.android/debug.keystore
+
+Credenciais geradas para depuração Android:
+- SHA-1: CC:47:D6:0D:2D:B9:C3:B5:39:44:3E:6D:5F:FE:46:E6:29:B2:F6:E1
+- SHA-256: 79:F4:2A:AD:31:58:F9:6D:7C:34:17:45:AA:B0:E8:DD:6D:A3:F2:E1:8E:4D:B4:19:53:69:7D:86:14:C9:C4:EA
+
+Ambos foram inseridos no Firebase Console em:
+Project settings > Your apps > Android > com.example.mobile_iii_3d.
+
+Comando usado para gerar a chave:
+keytool -genkeypair -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+
+Comando usado para listar os certificados:
+LANG=C keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
+
+O Android SDK não estava instalado no primeiro diagnóstico, portanto não houve teste Android ainda. Flutter doctor mostrou Chrome disponível e Android toolchain indisponível.
+
+============================================================
+DEPENDÊNCIAS
+============================================================
+
+O pubspec.yaml contém:
+- firebase_core
+- firebase_auth
+- google_sign_in
+- sign_in_with_apple
+- sqflite
+- path
+- sqflite_common_ffi apenas em dev_dependencies
+
+Não adicionar Drift ainda. O professor passou SQFLITE, não Drift. Focar em sqflite até resolver o SSO.
+
+============================================================
+COMO EXECUTAR A WEB
+============================================================
+
+Na raiz do projeto Flutter:
+cd /home/jeff-h-santos/repo/MOBILE-III/mobile_iii_3d
+flutter pub get
+flutter run -d chrome --web-port 8080
+
+Depois abrir:
+http://localhost:8080
+
+Comandos úteis:
+flutter devices
+flutter doctor -v
+flutter analyze
+flutter test test/auth_service_test.dart test/login_screen_test.dart
+
+============================================================
+COMPORTAMENTO ATUAL DA AUTENTICAÇÃO
+============================================================
+
+Login local:
+- Email/senha SQLite funciona com admin@teste.com / 123456.
+- Os testes de login local passam.
+
+Google Web:
+- A tela abre o fluxo Google.
+- O Google aceita o login.
+- Após o retorno, o aplicativo volta para a tela de login.
+- O Dashboard não é exibido.
+- Alterações já tentadas:
+  1. signInWithPopup
+  2. signInWithRedirect
+  3. getRedirectResult
+  4. authStateChanges
+  5. persistência do resultado no SQLite
+  6. tratamento de FirebaseAuthException e lastError
+
+Nenhum código de erro visível foi confirmado como suficiente para corrigir a API. O navegador pode ter devolvido ao localhost sem uma sessão Firebase. Esse é o problema central a investigar.
+
+============================================================
+IMPLEMENTAÇÃO SOCIAL ATUAL
+============================================================
+
+auth_service.dart possui métodos:
+- signInWithEmailPassword
+- signInWithGoogle
+- signInWithApple
+- signInWithGitHub
+- getWebRedirectResult
+- authenticatedUserChanges
+
+No Web, Google, Apple e GitHub devem usar signInWithRedirect.
+No Android, Google usa GoogleSignIn nativo e Firebase credential.
+No Android, GitHub usa signInWithProvider.
+Apple usa SignInWithApple e depois OAuthProvider('apple.com') no Firebase.
+
+Usuários sociais com email são sincronizados no SQLite por DbHelper.upsertSocialUser.
+
+A implementação atual não deve ser considerada concluída. Resolver primeiro o retorno Google Web.
+
+============================================================
+PROBLEMAS DETECTADOS DURANTE A IMPLEMENTAÇÃO
+============================================================
+
+1. android/app/build.gradle.kts tinha o Google Services declarado duplicadamente.
+   A duplicação foi removida; deve existir uma única aplicação do plugin com google-services.
+
+2. Foi encontrada uma dependência antiga de web com Cross-Origin-Opener-Policy em popup.
+   Por isso o código foi convertido para redirect.
+
+3. AndroidManifest.xml já possui permission INTERNET.
+
+4. O Flutter/Snap não possui Android SDK, então o teste Android não foi realizado.
+
+5. O Google Console confirmou o provedor Google ativado.
+
+6. Os domínios localhost e Firebase estão autorizados.
+
+7. Apple não foi integrado no navegador/Apple Developer por falta de credenciais da Apple.
+
+============================================================
+CORREÇÕES A VALIDAR NO ANTIGRAVITY
+============================================================
+
+A tarefa prioritária é investigar por que o Google login termina sem Firebase user no Web.
+
+Verificar:
+1. firebase_options.dart contém o app Web correto.
+2. main.dart chama Firebase.initializeApp antes de runApp.
+3. authDomain é mobile-iii-3d.firebaseapp.com.
+4. A configuração Web possui o appId e apiKey atuais.
+5. O provedor Google está ativado no Firebase Console.
+6. localhost está autorizado.
+7. getRedirectResult é chamado depois da inicialização completa do Firebase.
+8. authStateChanges não está sendo perdido pela navegação/reconstrução da tela.
+9. Se há erros 400/unauthorized-domain/invalid-api-key/operation-not-allowed.
+10. Usar signInWithPopup como alternativa temporária apenas se o redirect continuar falhando, mas tratar Cross-Origin-Opener-Policy.
+11. Não mascarar erros: registrar FirebaseAuthException.code e FirebaseAuthException.message no terminal.
+12. Confirmar se Firebase Auth recebe o usuário após redirecionamento:
+   - FirebaseAuth.instance.currentUser
+   - credential.user
+   - authStateChanges
+
+Não altere o pacote Android, o package name ou o projeto Firebase sem necessidade.
+
+============================================================
+SUGESTÃO DE TESTE ISOLADO
+============================================================
+
+Criar ou usar apenas um teste pequeno que faça:
+- Firebase.initializeApp
+- AuthService.signInWithGoogle
+- imprimir FirebaseAuthException
+- imprimir FirebaseAuth.instance.currentUser
+- imprimir getRedirectResult
+- navegar para Home somente se credential.user existir
+
+Não tentar resolver toda a tela enquanto o fluxo OAuth não estiver estável.
+
+============================================================
+REGRAS DO PROJETO ORIGINAL
+============================================================
+
+Leia antes de continuar o ERP:
+- Prompt Mestre do Projeto.md
+- Regras para Assistentes de IA.md
+
+O produto final deve ser Flutter multiplataforma com:
+- autenticação social
+- SQLite offline-first
+- gestão de impressoras
+- filamentos
+- insumos
+- clientes
+- produtos
+- produção
+- vendas
+- caixa
+- precificação
+- leitura de códigos de barras
+- arquivos 3MF/GCODE
+
+Mas essas funções são da etapa posterior. A etapa atual é somente Authentication.
+
+
+============================================================
+RESOLUÇÃO E DIAGNÓSTICO PELO ANTIGRAVITY (23/11/2026)
+============================================================
+
+1. CAUSA RAIZ IDENTIFICADA:
+   - No retorno do fluxo OAuth ou ao mapear o usuário social no AuthService._toUserMap, era chamado DbHelper.upsertSocialUser.
+   - O sqflite nativo não possui implementação Web pronta e invocava getDatabasesPath(), gerando MissingPluginException / UnsupportedError no Web.
+   - Essa falha interrompia silenciosamente o getRedirectResult() (capturado em catch genérico retornando null) e quebrava o stream authenticatedUserChanges.
+   - Além disso, signInWithRedirect retornava null imediatamente antes do navegador descarregar a página, acionando a mensagem de erro antes do redirecionamento.
+   - No getRedirectResult(), quando a sessão era restaurada pelo Firebase JS SDK antes de ler a credencial, FirebaseAuth.instance.currentUser já continha o usuário mas não era reaproveitado como fallback.
+
+2. AÇÕES E CORREÇÕES IMPLEMENTADAS:
+   a) DbHelper Multiplataforma (lib/database/db_helper.dart):
+      - Implementado suporte a ambiente Web via armazenamento em memória para usuários, mantendo sqflite nativo para Android/iOS/Desktop.
+      - upsertSocialUser, login e registerUser agora funcionam sem exceções tanto no Web quanto no Android.
+   b) AuthService Robusto (lib/services/auth_service.dart):
+      - Web: Implementado signInWithPopup como fluxo primário (mais rápido e sem perda de estado/recarregamento) e fallback automático para signInWithRedirect caso o popup seja bloqueado pelo navegador.
+      - getWebRedirectResult(): Agora recupera tanto o retorno do redirect quanto FirebaseAuth.instance.currentUser como fallback resiliente.
+      - _toUserMap(): O sincronismo com banco local agora é protegido por try/catch para que problemas de I/O local nunca abortem a autenticação social do usuário.
+      - Implementado método signOut() para permitir logout seguro de qualquer provedor.
+      - Log detalhado de erros com FirebaseAuthException.code e message para total rastreabilidade.
+   c) Interface e Navegação (lib/features/auth/screens/login_screen.dart & lib/features/home/screens/home_screen.dart):
+      - login_screen agora distingue redirecionamento em andamento de falha real, evitando avisos falsos de erro.
+      - Mensagens de erro são despachadas com addPostFrameCallback para evitar conflito de montagem de widget.
+      - home_screen ganhou botão de Logout (Sair da conta) no AppBar, reconduzindo à LoginScreen.
+   d) Análise e Testes:
+      - analysis_options.yaml configurado; `flutter analyze` finalizado com 0 alertas (No issues found!).
+      - widget_test.dart atualizado para o app real.
+      - home_screen_test.dart adicionado cobrindo renderização e logout.
+      - auth_service_test.dart ampliado com testes de banco social e signOut.
+      - Suíte completa de 8 testes aprovada: `All tests passed!`.
+      - Build de release Web validado com sucesso: `flutter build web --release`.

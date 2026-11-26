@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+import 'database/db_helper.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'firebase_options.dart';
 
@@ -8,6 +9,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await DbHelper.init();
 
   runApp(const MyApp());
 }

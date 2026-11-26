@@ -1,17 +1,35 @@
-# mobile_iii_3d
+# MOBILE-III 3D
 
-A new Flutter project.
+Aplicativo Flutter com login local SQLite e autenticação social pelo Firebase.
 
-## Getting Started
+## Executar
 
-This project is a starting point for a Flutter application.
+```bash
+flutter pub get
+flutter run -d chrome
+```
 
-A few resources to get you started if this is your first Flutter project:
+Usuário local de demonstração:
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- Email: `admin@teste.com`
+- Senha: `123456`
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Configuração dos provedores sociais
+
+No Firebase Console, habilite **Authentication > Sign-in method**:
+
+1. Google
+2. GitHub
+3. Apple
+
+Para Web, registre os domínios autorizados em **Authentication > Settings > Authorized domains**.
+
+Para Android, confirme que `android/app/google-services.json` corresponde ao projeto Firebase configurado e adicione a impressão SHA-1/SHA-256 do certificado em **Project settings > Your apps > Android**.
+
+Após alterar provedores ou configurações do Firebase:
+
+```bash
+flutterfire configure
+flutter pub get
+flutter run
+```
